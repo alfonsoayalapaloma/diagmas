@@ -1,4 +1,4 @@
-package co.scndfndtion.diagnmas.agents;
+package co.scndfndtion.diagmas.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
