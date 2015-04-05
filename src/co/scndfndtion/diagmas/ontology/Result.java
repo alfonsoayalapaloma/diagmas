@@ -1,7 +1,6 @@
 package co.scndfndtion.diagmas.ontology;
 
-
-
-public class Check {
+public class Result {
+	String name;
 
 }

@@ -32,7 +32,7 @@ public class IncidentOntology extends Ontology {
 	
 	public static final String PORT = "Port";
 	public static final String PORT_NAME = "name";
-	public static final String PORT_LOCALIZATION = "localization";
+	public static final String PORT_LOCATION = "location";
 	public static final String PORT_DEVICE = "device";
 	
 	
@@ -56,9 +56,15 @@ public class IncidentOntology extends Ontology {
 	
 	
 	//Agent actions i.e. special concepts that indicate actions that can be performed by some agents 
-	public static final String CHECK = "Check";
-	public static final String CHECK_DEVICE = "device";
-	public static final String CHECK_TEST = "test";
+	public static final String DOTEST = "Check";
+	public static final String DOTEST_PORT = "port";
+	public static final String DOTEST_TEST = "test";
+	
+	public static final String DODIAGNOSIS = "Check";
+	public static final String DODIAGNOSIS_PORT = "port";
+	public static final String DODIAGNOSIS_TEST = "test";
+	
+	
 	
 	
 	// The singleton instance of this ontology
@@ -79,13 +85,12 @@ public class IncidentOntology extends Ontology {
 			add(new ConceptSchema(SERVICE), Service.class); 
 			add(new ConceptSchema(DEVICE), Device.class);
 			add(new ConceptSchema(TEST), Test.class);
-			
-			
 			add(new ConceptSchema(DIAGNOSIS), Diagnosis.class);
 			
-			add(new PredicateSchema(OWNS), Owns.class);
+			//add(new PredicateSchema(OWNS), Owns.class);
 			
-			add(new AgentActionSchema(CHECK), Check.class);
+			add(new AgentActionSchema(DOTEST), DoTest.class);
+			add(new AgentActionSchema(DODIAGNOSIS), DoDiagnosis.class);
 
 			// Structure of the schema for the Incident concept
 			ConceptSchema cs = (ConceptSchema) getSchema(INCIDENT);
@@ -122,15 +127,15 @@ public class IncidentOntology extends Ontology {
 			cs.add(DIAGNOSIS_TESTS, (ConceptSchema) getSchema(TEST), 1,
 					ObjectSchema.UNLIMITED); // The tracks slot has cardinality > 1
 			
-			// Structure of the schema for the Owns predicate
-			PredicateSchema ps = (PredicateSchema) getSchema(OWNS);
-			ps.add(OWNS_OWNER, (ConceptSchema) getSchema(BasicOntology.AID));
-			ps.add(OWNS_ITEM, (ConceptSchema) getSchema(INCIDENT));
+//			// Structure of the schema for the Owns predicate
+//			PredicateSchema ps = (PredicateSchema) getSchema(OWNS);
+//			ps.add(OWNS_OWNER, (ConceptSchema) getSchema(BasicOntology.AID));
+//			ps.add(OWNS_ITEM, (ConceptSchema) getSchema(INCIDENT));
 			
 			// Structure of the schema for the Check agent action
-			AgentActionSchema as = (AgentActionSchema) getSchema(CHECK);
-			as.add(CHECK_TEST, (ConceptSchema) getSchema(INCIDENT));
-			as.add(CHECK_DEVICE, (ConceptSchema) getSchema(BasicOntology.AID));
+			AgentActionSchema as = (AgentActionSchema) getSchema(DOTEST);
+			as.add(DOTEST_TEST, (ConceptSchema) getSchema(INCIDENT));
+			as.add(DOTEST_PORT, (ConceptSchema) getSchema(BasicOntology.AID));
 		}
 		catch (OntologyException oe) {
 			oe.printStackTrace();

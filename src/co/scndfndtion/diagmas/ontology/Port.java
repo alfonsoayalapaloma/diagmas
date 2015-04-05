@@ -1,6 +1,7 @@
 package co.scndfndtion.diagmas.ontology;
 
-public class Device {
+public class Port {
 	String name;
-	String ip;
+	String location;
+	String device;
 }
