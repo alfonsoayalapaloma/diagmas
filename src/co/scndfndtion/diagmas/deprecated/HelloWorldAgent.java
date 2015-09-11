@@ -1,4 +1,4 @@
-package co.scndfndtion.diagmas.agents;
+package co.scndfndtion.diagmas.deprecated;
 
 import jade.core.Agent;
 

@@ -3,11 +3,7 @@ package co.scndfndtion.diagmas.ontology;
 import java.util.List;
 
 public class Diagnosis {
-	private String name;
-	private String recommendation;
-	private List tests; 	
-
-	public String getName() {
+	 public String getName() {
 		return name;
 	}
 	public void setName(String name) {
@@ -19,4 +15,7 @@ public class Diagnosis {
 	public void setTests(List tests) {
 		this.tests = tests;
 	}
+	private String name;
+	 private List tests; 
+
 }

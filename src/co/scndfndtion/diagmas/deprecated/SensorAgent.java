@@ -1,4 +1,4 @@
-package co.scndfndtion.diagmas.agents;
+package co.scndfndtion.diagmas.deprecated;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -6,7 +6,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 
-public class PingAgent extends Agent {
+public class SensorAgent extends Agent {
 	private MessageTemplate template = MessageTemplate.and(
 			MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF),
 			MessageTemplate.MatchOntology("presence") );

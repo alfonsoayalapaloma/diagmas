@@ -1,21 +1,20 @@
 package co.scndfndtion.diagmas.ontology;
 
 import jade.util.leap.List;
-public class Service { 
+public class Service extends Incident { // Note that the Item class (omitted here)
 	// implements Concept
 	private String name;
-	private List ports;
-	
+	private List tracks;
 	public String getName() {
 		return name;
 	}
 	public void setName(String n) {
 		name = n;
 	}
-	public List getPorts() {
-		return ports;
+	public List getTracks() {
+		return tracks;
 	}
-	public void setPorts(List l) {
-		ports = l;
+	public void setTracks(List l) {
+		tracks = l;
 	}
 } 

@@ -1,5 +1,8 @@
 package co.scndfndtion.diagmas.ontology;
 
-public class DoDiagnosis {
+import java.util.List;
 
+public class DoDiagnosis {
+	String name;
+	List tests;
 }
