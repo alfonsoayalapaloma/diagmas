@@ -172,13 +172,13 @@ public class DiagnosticatorAgent extends Agent {
 	// Put agent clean-up operations here
 	protected void takeDown() {
 		// Printout a dismissal message
-		System.out.println("Device-agent "+getAID().getName()+" terminating.");
+		System.out.println("Agent "+getAID().getName()+" terminating.");
 	}
 
 	/**
 	   Inner class RequestPerformer.
 	   This is the behaviour used by DiagnosticatorAgents to request DeviceAgents
-	   to run the commands.
+	   to run the commands, gather results, and produce a diagnosis
 	 */
 	private class RequestPerformer extends Behaviour {
 	// extends CyclicBehaviour{
@@ -192,13 +192,10 @@ public class DiagnosticatorAgent extends Agent {
 		private static final int RECEIVING_ANSWERS = 2;
 		private static final int QUERYING_DEVICES = 1;
 		private static final int INITIAL_STEP = 0;
-
 		private AID deviceAnswerer; // The agent who provides the best offer 
 		private int repliesCnt = 0; // The counter of replies from seller agents
 		private MessageTemplate mt; // The template to receive replies
 		private MessageTemplate mtemplate; // The template to receive replies
-
-
 		private int step = 0;
 		private AID diangosisRequester;
 		private String serviceToCheck;
@@ -228,20 +225,7 @@ public class DiagnosticatorAgent extends Agent {
 				// Receive all answers from device agents
 				ACLMessage initialQuery = myAgent.receive(mt);
 				if (initialQuery != null) {
-					// Reply received
-					if (initialQuery.getPerformative() == ACLMessage.REQUEST) {
-						// This is a request for diagnosis
-						System.out.println("Received diagnosis request from:"+ initialQuery.getSender().getName());
-						diangosisRequester = initialQuery.getSender();
-						if(initialQuery.getContent()!=null){
-							serviceToCheck = initialQuery.getContent().toString();
-							if(serviceToCheck!=null){
-								serviceId=serviceToCheck;
-								startAgents();
-							}
-							step = QUERYING_DEVICES;
-						}
-					}
+					receiveRequest(initialQuery);
 				}
 				else {
 					block();
@@ -251,41 +235,7 @@ public class DiagnosticatorAgent extends Agent {
 			case QUERYING_DEVICES:	
 				// Send the query to devices
 				//System.out.println("---Querying "+deviceAgents.length +" devices");
-				receivers=0;
-				ACLMessage cfp = new ACLMessage(ACLMessage.REQUEST);
-				for (int i = 0; i < deviceAgents.length; ++i) {
-					System.out.println("adding receiver:"+ i +" "+ deviceAgents[i].getName() );
-					
-					
-					String tmp = deviceAgents[i].getName();
-					String[] arr = new String[2];
-					arr = tmp.split("@");
-					String agentName = arr[0];
-					
-					
-					System.out.println("deviceName:"+agentName);
-					if( deviceList.contains(agentName)  ){
-						cfp.addReceiver(deviceAgents[i]);
-						System.out.println("is ok");
-
-						receivers++;
-					}else{
-						System.out.println("is NOT");
-					}
-				} 
-				cfp.setContent( serviceData );
-				cfp.setConversationId("sensor");
-				cfp.setReplyWith("sensor"+System.currentTimeMillis()); // Unique value
-
-				if(receivers>0){
-					System.out.println("query sent to ["+receivers+"] devices.");
-					myAgent.send( cfp );
-				}
-				// Prepare the template to get answers
-				mtemplate = MessageTemplate.and(MessageTemplate.MatchConversationId("sensor"),
-						MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
-				step = RECEIVING_ANSWERS;
-				System.out.println("step:"+step);	
+				sendMsgs();
 				break;
 
 			case RECEIVING_ANSWERS:
@@ -293,23 +243,7 @@ public class DiagnosticatorAgent extends Agent {
 				// Receive all answers from device agents
 				ACLMessage reply = myAgent.receive( mtemplate );
 				if (reply != null) {
-					// Reply received
-					if ( reply.getPerformative() == ACLMessage.INFORM ) {
-						// This is an answer 
-						System.out.println("Received from:"+ reply.getSender().getName());
-						deviceAnswerer = reply.getSender();
-						System.out.println("Received:"+ reply.getContent());
-						
-						if(reply.getContent()!=null && answerList!=null){
-							answerList.put(deviceAnswerer, reply.getContent().toString() );
-						}
-					}
-					repliesCnt++;
-					System.out.println("replies:"+repliesCnt+" length:"+receivers);
-					if (repliesCnt >= receivers) {
-						// We received all replies
-						step = SENDING_DIAGNOSIS; 
-					}
+					receiveAnswers(reply);
 				}
 				else {
 					block();
@@ -332,6 +266,78 @@ public class DiagnosticatorAgent extends Agent {
 				step=INITIAL_STEP;
 				break;
 			}        
+		}
+
+		private void receiveRequest(ACLMessage initialQuery) {
+			// Reply received
+			if (initialQuery.getPerformative() == ACLMessage.REQUEST) {
+				// This is a request for diagnosis
+				System.out.println("Received diagnosis request from:"+ initialQuery.getSender().getName());
+				diangosisRequester = initialQuery.getSender();
+				if(initialQuery.getContent()!=null){
+					serviceToCheck = initialQuery.getContent().toString();
+					if(serviceToCheck!=null){
+						serviceId=serviceToCheck;
+						startAgents();
+					}
+					step = QUERYING_DEVICES;
+				}
+			}
+		}
+
+		private void receiveAnswers(ACLMessage reply) {
+			// Reply received
+			if ( reply.getPerformative() == ACLMessage.INFORM ) {
+				// This is an answer 
+				System.out.println("Received from:"+ reply.getSender().getName());
+				deviceAnswerer = reply.getSender();
+				System.out.println("Received:"+ reply.getContent());
+				if(reply.getContent()!=null && answerList!=null){
+					answerList.put(deviceAnswerer, reply.getContent().toString() );
+				}
+			}
+			repliesCnt++;
+			System.out.println("replies:"+repliesCnt+" length:"+receivers);
+			if (repliesCnt >= receivers) {
+				// We received all replies
+				step = SENDING_DIAGNOSIS; 
+			}
+		}
+
+		private void sendMsgs() {
+			receivers=0;
+			
+			ACLMessage cfp = new ACLMessage(ACLMessage.REQUEST);
+			for (int i = 0; i < deviceAgents.length; ++i) {
+				System.out.println("adding receiver:"+ i +" "+ deviceAgents[i].getName() );
+				String tmp = deviceAgents[i].getName();
+				String[] arr = new String[2];
+				arr = tmp.split("@");
+				String agentName = arr[0];
+				System.out.println("deviceName:"+agentName);
+				if( deviceList.contains(agentName)  ){
+					cfp.addReceiver( deviceAgents[i] );
+					System.out.println("is ok");
+					receivers++;
+				}else{
+					System.out.println("is NOT");
+				}
+			} 	
+			
+			cfp.setContent( serviceData );
+			cfp.setConversationId("sensor");
+			cfp.setReplyWith("sensor"+System.currentTimeMillis()); // Unique value
+			
+			//if(receivers>0){
+			//	System.out.println("query sent to ["+receivers+"] devices.");
+			myAgent.send( cfp );
+			//}
+			// Prepare the template to get answers
+			mtemplate = MessageTemplate.and(MessageTemplate.MatchConversationId("sensor"),
+					MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
+			
+			step = RECEIVING_ANSWERS;
+			System.out.println("step:"+step);
 		}
 
 		public boolean done() {

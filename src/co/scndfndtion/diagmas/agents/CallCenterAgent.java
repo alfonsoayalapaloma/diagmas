@@ -10,7 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.wrapper.AgentController;
 
-public class FirstLevelAgent extends Agent{
+public class CallCenterAgent extends Agent{
 
 	/**
 	 * 

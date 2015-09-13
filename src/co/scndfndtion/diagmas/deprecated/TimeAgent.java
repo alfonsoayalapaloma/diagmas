@@ -12,7 +12,7 @@ public class TimeAgent extends Agent {
 		addBehaviour(new TickerBehaviour(this, 1000) {
 			protected void onTick() {
 				System.out.println("Agent "+myAgent.getLocalName()+": ping="+getTickCount());
-				Client.run();
+				Client.run(null, null, null, null);
 			} 
 		});
 		// Add the WakerBehaviour (wakeup-time 10 secs)

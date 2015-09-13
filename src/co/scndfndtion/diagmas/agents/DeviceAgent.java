@@ -83,7 +83,8 @@ public class DeviceAgent extends Agent {
 				String serviceId = msg.getContent();
 				ACLMessage reply = msg.createReply();
 
-				String rawAnswer = ProbeAnswerCoder.code( ip, 
+				String rawAnswer = ProbeAnswerCoder.code( 
+						ip, 
 						deviceType, 
 						CmdGateway.run("check", serviceId));
 				

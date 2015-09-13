@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.scndfndtion.commands.def.ExeParameter;
-import co.scndfndtion.commands.ruby.Debugger;
 
 /**
  * Runs a command
@@ -13,28 +12,32 @@ import co.scndfndtion.commands.ruby.Debugger;
  */
 public class Client {
 	/**
-	 * Executes a ping command
-	 * @return ping result
+	 * Client for running commands
+	 * @param probeType 
+	 * @param serviceId
+	 * @param ip 
+	 * @param cmd
+	 * @return
 	 */
-	public static String run(){
+	public static String run(String probeType, String serviceId, String ip, String cmd){
 		String result="";
 		String deviceIp="216.58.219.110"; //"127.0.0.1";
 		String strCmd = deviceIp;
-
+	
 		List<Probe> testList = new ArrayList<Probe>();
 
 		testList.add( ProbeFactory.create(PROBETYPE.PING) );
 		testList.add( ProbeFactory.create(PROBETYPE.IPCONFIG));
 
-		final ExeParameter param= new ExeParameter("aayala", "FullFillment2013*", strCmd, deviceIp, "", "/tmp", "ssh", "", "", "", "", "");
+		final ExeParameter param= new ExeParameter("aayala", "XXXXX", strCmd, deviceIp, "", "/tmp", "ssh", "", "", "", "", "");
 
 		for(Probe probe : testList){
 			if(probe!=null ){
-				Debugger.println("probe:"+probe.getCmd());
+				//Debugger.println("probe:"+probe.getCmd());
 				result += probe.run(param)+ "\n------------------------------\n";
 			}
 		}	
-		Debugger.println("result:{"+result+"}");
+		//Debugger.println("result:{"+result+"}");
 		return result;
 	}
 }
